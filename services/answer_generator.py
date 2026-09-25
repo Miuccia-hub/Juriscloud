@@ -79,6 +79,7 @@ def _language_instruction(language_mode: str) -> str:
 def stream_grounded_answer(
     question: str,
     search_results: list[SearchResult],
+    api_key: str,
     language_mode: str = "English",
     analysis_mode: str = "Standard",
     conversation_history: list[dict[str, Any]] | None = None,
@@ -90,11 +91,11 @@ def stream_grounded_answer(
     them using [S1], [S2] and similar source markers.
     """
 
-    api_key = os.getenv("OPENAI_API_KEY")
+    cleaned_api_key = api_key.strip()
 
-    if not api_key:
+    if not cleaned_api_key:
         raise ValueError(
-            "OPENAI_API_KEY is missing from the .env file."
+            "An OpenAI API key is required."
         )
 
     if not search_results:
@@ -119,7 +120,9 @@ def stream_grounded_answer(
         else standard_model
     )
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(
+        api_key=cleaned_api_key
+    )
 
     instructions = """
 You are Jurisource, a careful legal research assistant.

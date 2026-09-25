@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 import chromadb
@@ -41,38 +40,38 @@ class SearchResult:
 class JurisourceVectorStore:
     """Store and retrieve legal document passages with ChromaDB."""
 
-    def __init__(
+def __init__(
         self,
-        database_path: str | Path = "data/chroma",
+        api_key: str,
         collection_name: str = "jurisource_legal_sources",
     ) -> None:
-        api_key = os.getenv("OPENAI_API_KEY")
+        cleaned_api_key = api_key.strip()
 
-        if not api_key:
+        if not cleaned_api_key:
             raise ValueError(
-                "OPENAI_API_KEY is missing. Add it to the .env file."
+                "An OpenAI API key is required."
             )
 
         self.embedding_model = os.getenv(
             "OPENAI_EMBEDDING_MODEL",
-            "text-embedding-3-small",
+            "text-embedding-3-large",
         )
 
-        database_directory = Path(database_path)
-        database_directory.mkdir(parents=True, exist_ok=True)
-
-        self.openai_client = OpenAI(api_key=api_key)
-
-        self.chroma_client = chromadb.PersistentClient(
-            path=str(database_directory)
+        self.openai_client = OpenAI(
+            api_key=cleaned_api_key
         )
 
-        self.collection = self.chroma_client.get_or_create_collection(
-            name=collection_name,
-            metadata={"hnsw:space": "cosine"},
+        # Each user session receives an isolated in-memory database.
+        self.chroma_client = chromadb.EphemeralClient()
+
+        self.collection = (
+            self.chroma_client.get_or_create_collection(
+                name=collection_name,
+                metadata={"hnsw:space": "cosine"},
+            )
         )
 
-    def _create_embeddings(
+def _create_embeddings(
         self,
         texts: list[str],
     ) -> list[list[float]]:
@@ -97,7 +96,7 @@ class JurisourceVectorStore:
             for item in ordered_items
         ]
 
-    def index_chunks(
+def index_chunks(
         self,
         chunks: list[DocumentChunk],
         batch_size: int = 50,
@@ -128,14 +127,14 @@ class JurisourceVectorStore:
 
         return indexed_count
 
-    def delete_document(self, document_id: str) -> None:
+def delete_document(self, document_id: str) -> None:
         """Remove all indexed passages belonging to one document."""
 
         self.collection.delete(
             where={"document_id": {"$eq": document_id}}
         )
 
-    def search(
+def search(
         self,
         question: str,
         document_ids: list[str] | None = None,
@@ -236,7 +235,7 @@ class JurisourceVectorStore:
             )
 
         return search_results
-    def has_document(self, document_id: str) -> bool:
+def has_document(self, document_id: str) -> bool:
         """Check whether a document has already been indexed."""
 
         result = self.collection.get(
@@ -251,7 +250,7 @@ class JurisourceVectorStore:
 
         record_ids = result.get("ids") or []
         return bool(record_ids)
-    def count(self) -> int:
+def count(self) -> int:
         """Return the number of indexed passages."""
 
         return self.collection.count()

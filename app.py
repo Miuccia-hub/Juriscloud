@@ -12,6 +12,8 @@ from services.text_chunker import chunk_document
 from services.vector_store import JurisourceVectorStore
 from ui.styles import apply_styles
 from services.answer_generator import stream_grounded_answer
+from api_key import render_api_credentials_sidebar
+from auth import require_app_password
 
 
 st.set_page_config(
@@ -20,6 +22,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+if not require_app_password():
+    st.stop()
 
 apply_styles()
 st.markdown(
@@ -66,11 +71,28 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-@st.cache_resource
-def get_vector_store() -> JurisourceVectorStore:
-    """Create one shared vector-store connection."""
+def get_vector_store(api_key: str) -> JurisourceVectorStore:
+    """Return a session-specific vector store for the selected API key."""
 
-    return JurisourceVectorStore()
+    key_fingerprint = hashlib.sha256(
+        api_key.encode("utf-8")
+    ).hexdigest()
+
+    current_store = st.session_state.get("vector_store")
+    current_fingerprint = st.session_state.get(
+        "vector_store_key_fingerprint"
+    )
+
+    if (
+        current_store is None
+        or current_fingerprint != key_fingerprint
+    ):
+        st.session_state.vector_store = JurisourceVectorStore(
+            api_key=api_key
+        )
+        st.session_state.vector_store_key_fingerprint = key_fingerprint
+
+    return st.session_state.vector_store
 
 
 def initialise_session_state() -> None:
@@ -83,6 +105,8 @@ def initialise_session_state() -> None:
         "parsed_documents": {},
         "parsing_errors": {},
         "analysis_mode": "Standard",
+        "vector_store": None,
+        "vector_store_key_fingerprint": None,
     }
 
     for key, value in defaults.items():
@@ -311,12 +335,36 @@ def build_retrieval_message(results: list[Any]) -> str:
 
     return "\n".join(lines)
 
+def render_source_evidence(
+    sources: list[dict[str, Any]],
+) -> None:
+    """Show the exact retrieved passages behind an answer."""
 
+    if not sources:
+        return
+
+    with st.expander(
+        f"View cited passages ({len(sources)})"
+    ):
+        for source in sources:
+            st.markdown(
+                f"**[{source['source_id']}] "
+                f"{source['citation_label']}**"
+            )
+
+            quoted_text = str(source["text"]).replace(
+                "\n",
+                "\n> ",
+            )
+
+            st.markdown(f"> {quoted_text}")
+            st.divider()
 initialise_session_state()
 
 uploaded_files = []
-parsed_items: list[dict[str, Any]] = []
-vector_store: JurisourceVectorStore | None = None
+parsed_items = []
+vector_store = None
+selected_api_key: str | None = None
 
 
 with st.sidebar:
@@ -334,7 +382,9 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
+    selected_api_key = render_api_credentials_sidebar()
 
+    st.divider()
     st.subheader("Document library")
 
     uploaded_files = st.file_uploader(
@@ -371,7 +421,7 @@ with st.sidebar:
             parsed_items = parse_uploaded_files(uploaded_files)
 
         try:
-            vector_store = get_vector_store()
+            vector_store = get_vector_store(selected_api_key)
 
             with st.spinner("Preparing the searchable index..."):
                 index_parsed_documents(
@@ -585,6 +635,11 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+        if message["role"] == "assistant":
+            render_source_evidence(
+                message.get("sources", [])
+            )
+
 
 if not st.session_state.messages:
     if indexed_items:
@@ -671,6 +726,7 @@ if user_question and vector_store is not None:
 
         complete_answer = ""
         first_text_received = False
+        verified_sources: list[dict[str, Any]] = []
 
         try:
             search_results = vector_store.search(
@@ -727,9 +783,22 @@ if user_question and vector_store is not None:
                         f"{result.citation_label}"
                     )
 
+                    verified_sources.append(
+                        {
+                            "source_id": f"S{source_number}",
+                            "citation_label": (
+                                result.citation_label
+                            ),
+                            "text": result.text,
+                            "filename": result.filename,
+                            "page_number": result.page_number,
+                        }
+                    )
+
                 complete_answer += "\n".join(source_lines)
 
             answer_placeholder.markdown(complete_answer)
+            render_source_evidence(verified_sources)
 
         except Exception as error:
             thinking_placeholder.empty()
@@ -741,9 +810,10 @@ if user_question and vector_store is not None:
 
             answer_placeholder.error(complete_answer)
 
-    st.session_state.messages.append(
+        st.session_state.messages.append(
         {
             "role": "assistant",
             "content": complete_answer,
+            "sources": verified_sources,
         }
     )
