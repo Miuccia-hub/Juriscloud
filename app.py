@@ -420,17 +420,22 @@ with st.sidebar:
         with st.spinner("Reading your legal documents..."):
             parsed_items = parse_uploaded_files(uploaded_files)
 
-        try:
-            vector_store = get_vector_store(selected_api_key)
+        if selected_api_key:
+            try:
+                vector_store = get_vector_store(selected_api_key)
 
-            with st.spinner("Preparing the searchable index..."):
-                index_parsed_documents(
-                    parsed_items,
-                    vector_store,
-                )
+                with st.spinner("Preparing the searchable index..."):
+                    index_parsed_documents(
+                        parsed_items,
+                        vector_store,
+                    )
 
-        except Exception as error:
-            st.error(f"Vector database error: {error}")
+            except Exception as error:
+                st.error(f"Vector database error: {error}")
+        else:
+            st.warning(
+                "Choose an API access option before indexing documents."
+            )
 
         indexed_items = [
             item
@@ -738,6 +743,7 @@ if user_question and vector_store is not None:
             answer_stream = stream_grounded_answer(
                 question=user_question,
                 search_results=search_results,
+                api_key=selected_api_key,
                 language_mode=st.session_state.language_mode,
                 analysis_mode=st.session_state.analysis_mode,
                 conversation_history=earlier_history,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import Any
+from uuid import uuid4
 
 import chromadb
 from dotenv import load_dotenv
@@ -40,7 +41,7 @@ class SearchResult:
 class JurisourceVectorStore:
     """Store and retrieve legal document passages with ChromaDB."""
 
-def __init__(
+    def __init__(
         self,
         api_key: str,
         collection_name: str = "jurisource_legal_sources",
@@ -64,14 +65,18 @@ def __init__(
         # Each user session receives an isolated in-memory database.
         self.chroma_client = chromadb.EphemeralClient()
 
+        session_collection_name = (
+            f"{collection_name}_{uuid4().hex}"
+        )
+
         self.collection = (
             self.chroma_client.get_or_create_collection(
-                name=collection_name,
+                name=session_collection_name,
                 metadata={"hnsw:space": "cosine"},
             )
         )
 
-def _create_embeddings(
+    def _create_embeddings(
         self,
         texts: list[str],
     ) -> list[list[float]]:
@@ -96,7 +101,7 @@ def _create_embeddings(
             for item in ordered_items
         ]
 
-def index_chunks(
+    def index_chunks(
         self,
         chunks: list[DocumentChunk],
         batch_size: int = 50,
@@ -114,7 +119,10 @@ def index_chunks(
             embeddings = self._create_embeddings(texts)
 
             self.collection.upsert(
-                ids=[chunk.chunk_id for chunk in batch],
+                ids=[
+                    chunk.chunk_id
+                    for chunk in batch
+                ],
                 documents=texts,
                 embeddings=embeddings,
                 metadatas=[
@@ -127,14 +135,21 @@ def index_chunks(
 
         return indexed_count
 
-def delete_document(self, document_id: str) -> None:
+    def delete_document(
+        self,
+        document_id: str,
+    ) -> None:
         """Remove all indexed passages belonging to one document."""
 
         self.collection.delete(
-            where={"document_id": {"$eq": document_id}}
+            where={
+                "document_id": {
+                    "$eq": document_id
+                }
+            }
         )
 
-def search(
+    def search(
         self,
         question: str,
         document_ids: list[str] | None = None,
@@ -182,9 +197,17 @@ def search(
             **query_arguments
         )
 
-        documents = (raw_results.get("documents") or [[]])[0]
-        metadatas = (raw_results.get("metadatas") or [[]])[0]
-        distances = (raw_results.get("distances") or [[]])[0]
+        documents = (
+            raw_results.get("documents") or [[]]
+        )[0]
+
+        metadatas = (
+            raw_results.get("metadatas") or [[]]
+        )[0]
+
+        distances = (
+            raw_results.get("distances") or [[]]
+        )[0]
 
         search_results: list[SearchResult] = []
 
@@ -206,7 +229,10 @@ def search(
             if not isinstance(page_number, int):
                 page_number = None
 
-            chunk_index = metadata.get("chunk_index", index)
+            chunk_index = metadata.get(
+                "chunk_index",
+                index,
+            )
 
             if not isinstance(chunk_index, int):
                 chunk_index = index
@@ -215,7 +241,10 @@ def search(
                 SearchResult(
                     text=text,
                     document_id=str(
-                        metadata.get("document_id", "")
+                        metadata.get(
+                            "document_id",
+                            "",
+                        )
                     ),
                     filename=str(
                         metadata.get(
@@ -235,7 +264,11 @@ def search(
             )
 
         return search_results
-def has_document(self, document_id: str) -> bool:
+
+    def has_document(
+        self,
+        document_id: str,
+    ) -> bool:
         """Check whether a document has already been indexed."""
 
         result = self.collection.get(
@@ -250,8 +283,8 @@ def has_document(self, document_id: str) -> bool:
 
         record_ids = result.get("ids") or []
         return bool(record_ids)
-def count(self) -> int:
+
+    def count(self) -> int:
         """Return the number of indexed passages."""
 
         return self.collection.count()
-    
