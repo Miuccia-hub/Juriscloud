@@ -1,0 +1,11 @@
+streamlit
+openai
+chromadb
+pypdf
+python-docx
+python-dotenv
+langchain-text-splitters
+rank-bm25
+charset-normalizer
+tiktoken
+pytest
