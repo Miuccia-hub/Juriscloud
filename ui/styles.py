@@ -23,7 +23,7 @@ def apply_styles() -> None:
             color: var(--jurisource-text);
         }
 
-        /* Compact sidebar layout */
+    /* Balanced sidebar layout */
 section[data-testid="stSidebar"]
 [data-testid="stSidebarContent"] {
     padding-top: 0 !important;
@@ -31,28 +31,36 @@ section[data-testid="stSidebar"]
 
 section[data-testid="stSidebar"]
 [data-testid="stSidebarUserContent"] {
-    padding-top: 0 !important;
+    padding-top: 0.8rem !important;
+    padding-bottom: 1.2rem !important;
 }
 
 .jurisource-brand {
-    margin-top: -3rem !important;
-    margin-bottom: 0.35rem !important;
-}
-
-section[data-testid="stSidebar"] hr {
-    margin: 0.3rem 0 !important;
-}
-
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    padding-top: 0 !important;
-    margin-top: 0.3rem !important;
-    margin-bottom: 0.25rem !important;
+    margin-top: -1rem !important;
+    margin-bottom: 1.1rem !important;
 }
 
 section[data-testid="stSidebar"]
 [data-testid="stVerticalBlock"] {
-    gap: 0.4rem !important;
+    gap: 0.75rem !important;
+}
+
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    padding-top: 0.2rem !important;
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+section[data-testid="stSidebar"] hr {
+    margin: 1rem 0 !important;
+}
+
+/* Add breathing room around sidebar alerts */
+section[data-testid="stSidebar"]
+[data-testid="stAlert"] {
+    margin-top: 0.4rem !important;
+    margin-bottom: 0.4rem !important;
 }
 
 .jurisource-brand {
