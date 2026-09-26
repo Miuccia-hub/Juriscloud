@@ -23,15 +23,47 @@ def apply_styles() -> None:
             color: var(--jurisource-text);
         }
 
-        [data-testid="stSidebar"] {
-            background: var(--jurisource-soft-background);
-            border-right: 1px solid var(--jurisource-border);
-        }
+        /* Compact sidebar layout */
+section[data-testid="stSidebar"]
+[data-testid="stSidebarContent"] {
+    padding-top: 0 !important;
+}
 
-        [data-testid="stSidebar"] > div:first-child {
-            padding-top: 1.4rem;
-        }
+section[data-testid="stSidebar"]
+[data-testid="stSidebarUserContent"] {
+    padding-top: 0 !important;
+}
 
+.jurisource-brand {
+    margin-top: -3rem !important;
+    margin-bottom: 0.35rem !important;
+}
+
+section[data-testid="stSidebar"] hr {
+    margin: 0.3rem 0 !important;
+}
+
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    padding-top: 0 !important;
+    margin-top: 0.3rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+section[data-testid="stSidebar"]
+[data-testid="stVerticalBlock"] {
+    gap: 0.4rem !important;
+}
+
+.jurisource-brand {
+    margin-top: 0 !important;
+    margin-bottom: 0.6rem !important;
+}
+
+.jurisource-brand-description {
+    margin-top: 0.1rem !important;
+    margin-bottom: 0 !important;
+}
         .block-container {
             max-width: 960px;
             padding-top: 1.5rem;

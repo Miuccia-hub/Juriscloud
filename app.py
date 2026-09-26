@@ -14,6 +14,7 @@ from ui.styles import apply_styles
 from services.answer_generator import stream_grounded_answer
 from api_key import render_api_credentials_sidebar
 from auth import require_app_password
+import streamlit.components.v1 as components
 
 
 st.set_page_config(
@@ -823,3 +824,37 @@ if user_question and vector_store is not None:
             "sources": verified_sources,
         }
     )
+        components.html(
+    """
+    <script>
+        function scrollAppToTop() {
+            const parentDocument = window.parent.document;
+
+            const targets = [
+                parentDocument.documentElement,
+                parentDocument.body,
+                parentDocument.querySelector('[data-testid="stAppViewContainer"]'),
+                parentDocument.querySelector('[data-testid="stMain"]'),
+                parentDocument.querySelector('.stMain'),
+                parentDocument.querySelector('section.main')
+            ];
+
+            targets.forEach((element) => {
+                if (element) {
+                    element.scrollTop = 0;
+                    element.scrollTo?.(0, 0);
+                }
+            });
+
+            window.parent.scrollTo(0, 0);
+        }
+
+        scrollAppToTop();
+        setTimeout(scrollAppToTop, 100);
+        setTimeout(scrollAppToTop, 300);
+        setTimeout(scrollAppToTop, 700);
+        setTimeout(scrollAppToTop, 1200);
+    </script>
+    """,
+    height=0,
+)
