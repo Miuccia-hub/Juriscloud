@@ -16,67 +16,60 @@ def apply_styles() -> None:
             --jurisource-border: #dce5ef;
             --jurisource-text: #10233f;
             --jurisource-muted: #66758a;
+
+            --jurisource-user-avatar: #bfe7f0;
+            --jurisource-assistant-avatar: #fdd7d0;
+            --jurisource-avatar-icon: #10233f;
         }
 
+        /* Main application */
         .stApp {
             background: var(--jurisource-background);
             color: var(--jurisource-text);
         }
 
-/* Balanced, slightly relaxed sidebar */
-section[data-testid="stSidebar"]
-[data-testid="stSidebarUserContent"] {
-    padding-top: 1.1rem !important;
-    padding-bottom: 1.5rem !important;
-}
-
-.jurisource-brand {
-    margin-top: -0.5rem !important;
-    margin-bottom: 1.4rem !important;
-}
-
-section[data-testid="stSidebar"]
-[data-testid="stVerticalBlock"] {
-    gap: 0.95rem !important;
-}
-
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    padding-top: 0.25rem !important;
-    margin-top: 1rem !important;
-    margin-bottom: 0.65rem !important;
-}
-
-section[data-testid="stSidebar"] hr {
-    margin: 1.25rem 0 !important;
-}
-
-section[data-testid="stSidebar"]
-[data-testid="stAlert"] {
-    margin-top: 0.55rem !important;
-    margin-bottom: 0.55rem !important;
-}
-
-.jurisource-brand {
-    margin-top: 0 !important;
-    margin-bottom: 0.6rem !important;
-}
-
-.jurisource-brand-description {
-    margin-top: 0.1rem !important;
-    margin-bottom: 0 !important;
-}
         .block-container {
             max-width: 960px;
             padding-top: 1.5rem;
             padding-bottom: 2rem;
         }
 
+        /* Sidebar spacing */
+        section[data-testid="stSidebar"]
+        [data-testid="stSidebarUserContent"] {
+            padding-top: 1rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        section[data-testid="stSidebar"]
+        [data-testid="stVerticalBlock"] {
+            gap: 0.95rem !important;
+        }
+
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {
+            padding-top: 0.2rem !important;
+            margin-top: 0.8rem !important;
+            margin-bottom: 0.6rem !important;
+        }
+
+        section[data-testid="stSidebar"] hr {
+            margin: 1.15rem 0 !important;
+        }
+
+        section[data-testid="stSidebar"]
+        [data-testid="stAlert"] {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Brand */
         .jurisource-brand {
             display: flex;
             align-items: center;
             gap: 0.65rem;
-            margin-bottom: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 1.2rem;
         }
 
         .jurisource-logo {
@@ -108,15 +101,18 @@ section[data-testid="stSidebar"]
             white-space: nowrap;
         }
 
+        /* Main page heading */
         .jurisource-header {
             margin-bottom: 1rem;
         }
 
         .jurisource-header h1 {
+            margin-top: 0;
             margin-bottom: 0.35rem;
             color: var(--jurisource-text);
             font-size: 2rem;
             font-weight: 600;
+            line-height: 1.2;
         }
 
         .jurisource-header p {
@@ -124,6 +120,7 @@ section[data-testid="stSidebar"]
             color: var(--jurisource-muted);
         }
 
+        /* Empty state */
         .jurisource-empty {
             margin-top: 1.5rem;
             padding: 2.4rem 1.5rem;
@@ -151,6 +148,7 @@ section[data-testid="stSidebar"]
             font-size: 0.9rem;
         }
 
+        /* Legal disclaimer */
         .jurisource-disclaimer {
             margin: 0.8rem 0 1.1rem;
             padding: 0.7rem 0.9rem;
@@ -160,6 +158,7 @@ section[data-testid="stSidebar"]
             font-size: 0.82rem;
         }
 
+        /* Uploaded document cards */
         .jurisource-file {
             margin-bottom: 0.45rem;
             padding: 0.65rem 0.75rem;
@@ -176,6 +175,7 @@ section[data-testid="stSidebar"]
             font-size: 0.72rem;
         }
 
+        /* Streamlit controls */
         .stButton > button {
             border-radius: 0.7rem;
         }
@@ -192,6 +192,37 @@ section[data-testid="stSidebar"]
             border-radius: 1rem;
         }
 
+        /* User avatar */
+        [data-testid="stChatMessageAvatarUser"] {
+            background-color:
+                var(--jurisource-user-avatar) !important;
+            color:
+                var(--jurisource-avatar-icon) !important;
+        }
+
+        /* Assistant avatar */
+        [data-testid="stChatMessageAvatarAssistant"] {
+            background-color:
+                var(--jurisource-assistant-avatar) !important;
+            color:
+                var(--jurisource-avatar-icon) !important;
+        }
+
+        /* Avatar icon colour */
+        [data-testid="stChatMessageAvatarUser"] svg,
+        [data-testid="stChatMessageAvatarAssistant"] svg {
+            color:
+                var(--jurisource-avatar-icon) !important;
+            fill: currentColor !important;
+        }
+
+        [data-testid="stChatMessageAvatarUser"] span,
+        [data-testid="stChatMessageAvatarAssistant"] span {
+            color:
+                var(--jurisource-avatar-icon) !important;
+        }
+
+        /* Hide Streamlit branding */
         #MainMenu {
             visibility: hidden;
         }
