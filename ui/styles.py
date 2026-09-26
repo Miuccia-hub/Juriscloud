@@ -193,28 +193,23 @@ def apply_styles() -> None:
         }
 
         /* User avatar */
-        [data-testid="stChatMessageAvatarUser"] {
-            background-color:
-                var(--jurisource-user-avatar) !important;
-            color:
-                var(--jurisource-avatar-icon) !important;
-        }
+[data-testid="chatAvatarIcon-user"] {
+    background: var(--jurisource-user-avatar) !important;
+    color: var(--jurisource-avatar-icon) !important;
+}
 
         /* Assistant avatar */
-        [data-testid="stChatMessageAvatarAssistant"] {
-            background-color:
-                var(--jurisource-assistant-avatar) !important;
-            color:
-                var(--jurisource-avatar-icon) !important;
-        }
+[data-testid="chatAvatarIcon-assistant"] {
+    background: var(--jurisource-assistant-avatar) !important;
+    color: var(--jurisource-avatar-icon) !important;
+}
 
         /* Avatar icon colour */
-        [data-testid="stChatMessageAvatarUser"] svg,
-        [data-testid="stChatMessageAvatarAssistant"] svg {
-            color:
-                var(--jurisource-avatar-icon) !important;
-            fill: currentColor !important;
-        }
+[data-testid="chatAvatarIcon-user"] svg,
+[data-testid="chatAvatarIcon-assistant"] svg {
+    color: var(--jurisource-avatar-icon) !important;
+    fill: currentColor !important;
+}
 
         [data-testid="stChatMessageAvatarUser"] span,
         [data-testid="stChatMessageAvatarAssistant"] span {
