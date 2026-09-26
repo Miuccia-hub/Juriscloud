@@ -555,7 +555,40 @@ with language_column:
         options=["English", "English + 中文"],
         key="language_mode",
     )
+if "_initial_scroll_complete" not in st.session_state:
+    components.html(
+        """
+        <script>
+            function scrollToAppTop() {
+                const doc = window.parent.document;
 
+                const targets = [
+                    doc.documentElement,
+                    doc.body,
+                    doc.querySelector('[data-testid="stAppViewContainer"]'),
+                    doc.querySelector('[data-testid="stMain"]'),
+                    doc.querySelector('.stMain')
+                ];
+
+                targets.forEach((element) => {
+                    if (element) {
+                        element.scrollTop = 0;
+                        element.scrollTo?.(0, 0);
+                    }
+                });
+
+                window.parent.scrollTo(0, 0);
+            }
+
+            setTimeout(scrollToAppTop, 100);
+            setTimeout(scrollToAppTop, 350);
+            setTimeout(scrollToAppTop, 800);
+        </script>
+        """,
+        height=0,
+    )
+
+    st.session_state["_initial_scroll_complete"] = True
 
 st.radio(
     "Research mode",
@@ -824,37 +857,4 @@ if user_question and vector_store is not None:
             "sources": verified_sources,
         }
     )
-        components.html(
-    """
-    <script>
-        function scrollAppToTop() {
-            const parentDocument = window.parent.document;
-
-            const targets = [
-                parentDocument.documentElement,
-                parentDocument.body,
-                parentDocument.querySelector('[data-testid="stAppViewContainer"]'),
-                parentDocument.querySelector('[data-testid="stMain"]'),
-                parentDocument.querySelector('.stMain'),
-                parentDocument.querySelector('section.main')
-            ];
-
-            targets.forEach((element) => {
-                if (element) {
-                    element.scrollTop = 0;
-                    element.scrollTo?.(0, 0);
-                }
-            });
-
-            window.parent.scrollTo(0, 0);
-        }
-
-        scrollAppToTop();
-        setTimeout(scrollAppToTop, 100);
-        setTimeout(scrollAppToTop, 300);
-        setTimeout(scrollAppToTop, 700);
-        setTimeout(scrollAppToTop, 1200);
-    </script>
-    """,
-    height=0,
-)
+       

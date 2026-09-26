@@ -23,44 +23,38 @@ def apply_styles() -> None:
             color: var(--jurisource-text);
         }
 
-    /* Balanced sidebar layout */
-section[data-testid="stSidebar"]
-[data-testid="stSidebarContent"] {
-    padding-top: 0 !important;
-}
-
+/* Balanced, slightly relaxed sidebar */
 section[data-testid="stSidebar"]
 [data-testid="stSidebarUserContent"] {
-    padding-top: 0.8rem !important;
-    padding-bottom: 1.2rem !important;
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.5rem !important;
 }
 
 .jurisource-brand {
-    margin-top: -1rem !important;
-    margin-bottom: 1.1rem !important;
+    margin-top: -0.5rem !important;
+    margin-bottom: 1.4rem !important;
 }
 
 section[data-testid="stSidebar"]
 [data-testid="stVerticalBlock"] {
-    gap: 0.75rem !important;
+    gap: 0.95rem !important;
 }
 
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    padding-top: 0.2rem !important;
-    margin-top: 0.75rem !important;
-    margin-bottom: 0.5rem !important;
+    padding-top: 0.25rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0.65rem !important;
 }
 
 section[data-testid="stSidebar"] hr {
-    margin: 1rem 0 !important;
+    margin: 1.25rem 0 !important;
 }
 
-/* Add breathing room around sidebar alerts */
 section[data-testid="stSidebar"]
 [data-testid="stAlert"] {
-    margin-top: 0.4rem !important;
-    margin-bottom: 0.4rem !important;
+    margin-top: 0.55rem !important;
+    margin-bottom: 0.55rem !important;
 }
 
 .jurisource-brand {
