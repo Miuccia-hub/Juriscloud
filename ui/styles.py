@@ -192,22 +192,28 @@ def apply_styles() -> None:
             border-radius: 1rem;
         }
 
-        /* User avatar */
-[data-testid="chatAvatarIcon-user"] {
-    background: var(--jurisource-user-avatar) !important;
-    color: var(--jurisource-avatar-icon) !important;
+/* User avatar */
+div[data-testid="stChatMessage"]
+div[data-testid="chatAvatarIcon-user"] {
+    background: #bfe7f0 !important;
+    background-color: #bfe7f0 !important;
+    color: #10233f !important;
 }
 
-        /* Assistant avatar */
-[data-testid="chatAvatarIcon-assistant"] {
-    background: var(--jurisource-assistant-avatar) !important;
-    color: var(--jurisource-avatar-icon) !important;
+/* Assistant avatar */
+div[data-testid="stChatMessage"]
+div[data-testid="chatAvatarIcon-assistant"] {
+    background: #fdd7d0 !important;
+    background-color: #fdd7d0 !important;
+    color: #10233f !important;
 }
 
-        /* Avatar icon colour */
-[data-testid="chatAvatarIcon-user"] svg,
-[data-testid="chatAvatarIcon-assistant"] svg {
-    color: var(--jurisource-avatar-icon) !important;
+/* Avatar icons */
+div[data-testid="stChatMessage"]
+div[data-testid="chatAvatarIcon-user"] svg,
+div[data-testid="stChatMessage"]
+div[data-testid="chatAvatarIcon-assistant"] svg {
+    color: #10233f !important;
     fill: currentColor !important;
 }
 
