@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import html
-from typing import Any
 import re
+from typing import Any
 
 import streamlit as st
+from openai import OpenAI
 
 from services.document_parser import DocumentParsingError, parse_document
 from services.text_chunker import chunk_document
@@ -95,6 +97,52 @@ def get_vector_store(api_key: str) -> JurisourceVectorStore:
         st.session_state.vector_store_key_fingerprint = key_fingerprint
 
     return st.session_state.vector_store
+
+
+def extract_text_from_image(
+    image_bytes: bytes,
+    mime_type: str,
+    api_key: str,
+) -> str:
+    """Extract visible text from an uploaded image with OpenAI vision."""
+
+    encoded_image = base64.b64encode(image_bytes).decode("ascii")
+    image_url = f"data:{mime_type};base64,{encoded_image}"
+    client = OpenAI(api_key=api_key)
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Extract all visible text from this image "
+                            "faithfully. Preserve headings, paragraphs, "
+                            "lists, and reading order where possible. "
+                            "Return only the extracted text."
+                        ),
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_url,
+                            "detail": "high",
+                        },
+                    },
+                ],
+            }
+        ],
+    )
+
+    extracted_text = response.choices[0].message.content or ""
+
+    if not extracted_text.strip():
+        raise ValueError("No readable text was found in the image.")
+
+    return extracted_text.strip()
 
 
 def initialise_session_state() -> None:
@@ -391,9 +439,15 @@ with st.sidebar:
 
     uploaded_files = st.file_uploader(
         "Upload legal documents",
-        type=["pdf", "txt", "docx", "doc"],
+        type=["pdf", "txt", "docx"],
         accept_multiple_files=True,
         help="Upload up to 10 files. Maximum size: 25 MB per file.",
+    )
+    st.markdown(
+        '<p class="juriscloud-upload-formats">'
+        '25MB per file · PDF, TXT, DOCX'
+        '</p>',
+        unsafe_allow_html=True,
     )
 
     if uploaded_files:
@@ -604,6 +658,14 @@ composer.markdown(
     unsafe_allow_html=True,
 )
 
+pending_image_text = st.session_state.pop(
+    "juriscloud_pending_image_text",
+    None,
+)
+
+if pending_image_text:
+    st.session_state.juriscloud_question_draft = pending_image_text
+
 question_draft = composer.text_area(
     "Question",
     placeholder="Ask a question about your indexed document chunks…",
@@ -618,11 +680,62 @@ control_columns = composer.columns(
 )
 
 with control_columns[0]:
-    upload_help_clicked = st.button(
-        "＋",
-        key="juriscloud_upload_help",
-        help="Upload source documents from the sidebar.",
-    )
+    with st.popover("🖼"):
+        st.caption("Upload an image and extract its visible text with AI.")
+        uploaded_image = st.file_uploader(
+            "Image for text extraction",
+            type=["png", "jpg", "jpeg", "webp"],
+            accept_multiple_files=False,
+            key="juriscloud_image_for_ocr",
+            label_visibility="collapsed",
+        )
+
+        if uploaded_image is not None:
+            image_bytes = uploaded_image.getvalue()
+
+            if len(image_bytes) > 10 * 1024 * 1024:
+                st.error("Please upload an image smaller than 10 MB.")
+            elif not selected_api_key:
+                st.warning(
+                    "Choose an API access option before extracting text."
+                )
+            else:
+                image_fingerprint = hashlib.sha256(
+                    image_bytes
+                ).hexdigest()
+
+                if (
+                    st.session_state.get(
+                        "juriscloud_processed_image_fingerprint"
+                    )
+                    != image_fingerprint
+                ):
+                    try:
+                        with st.spinner("Extracting text from the image..."):
+                            extracted_image_text = extract_text_from_image(
+                                image_bytes=image_bytes,
+                                mime_type=(
+                                    uploaded_image.type or "image/png"
+                                ),
+                                api_key=selected_api_key,
+                            )
+
+                        st.session_state[
+                            "juriscloud_processed_image_fingerprint"
+                        ] = image_fingerprint
+                        st.session_state[
+                            "juriscloud_pending_image_text"
+                        ] = extracted_image_text
+                        st.session_state[
+                            "juriscloud_image_extraction_notice"
+                        ] = (
+                            "Image text extracted. Review or edit it "
+                            "before sending."
+                        )
+                        st.rerun()
+
+                    except Exception as error:
+                        st.error(f"Could not extract image text: {error}")
 
 with control_columns[1]:
     with st.popover(
@@ -708,9 +821,9 @@ with control_columns[4]:
         key="juriscloud_send",
     )
 
-if upload_help_clicked:
+if st.session_state.get("juriscloud_image_extraction_notice"):
     composer.caption(
-        "Use the Document library in the left sidebar to upload sources."
+        st.session_state.pop("juriscloud_image_extraction_notice")
     )
 
 suggestion_columns = st.columns(3, gap="small")

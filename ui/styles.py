@@ -32,11 +32,7 @@ html, body, [class*="css"], .stApp, button, input, textarea, select {
 
 .stApp {
     color: var(--jc-text);
-    background:
-        radial-gradient(circle at 55% 43%, rgba(237, 233, 254, 0.34) 0,
-            rgba(240, 249, 255, 0.15) 27rem,
-            rgba(245, 251, 255, 0) 43rem),
-        var(--jc-page);
+    background: var(--jc-page);
 }
 
 /* Remove Streamlit's blank application header. It remains after deployment
@@ -53,13 +49,13 @@ html, body, [class*="css"], .stApp, button, input, textarea, select {
 footer { display: none !important; }
 
 [data-testid="stAppViewContainer"],
-[data-testid="stMain"] { background: transparent !important; }
+[data-testid="stMain"] { background: var(--jc-page) !important; }
 
 .block-container {
     width: min(100%, 48rem);
     max-width: 48rem;
     min-height: 100vh;
-    padding: clamp(3.75rem, 9vh, 5.75rem) 1.5rem 4rem;
+    padding: 1.65rem 1.5rem 4rem;
 }
 
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
@@ -86,6 +82,7 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
     padding: 1.15rem 1rem 1rem !important;
+    transform: translateY(-2.75rem);
 }
 
 section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
@@ -165,16 +162,44 @@ section[data-testid="stSidebar"] hr {
 }
 
 section[data-testid="stSidebar"] [data-testid="stAlert"] {
-    border: 1px solid rgba(167, 243, 208, 0.8);
+    border: 1px solid #a7f3d0 !important;
     border-radius: 0.75rem;
-    background: rgba(236, 253, 245, 0.88);
-    color: #047857;
+    background: #ecfdf5 !important;
+    color: #087b58 !important;
     font-size: 0.7rem;
 }
 
+section[data-testid="stSidebar"] [data-testid="stAlert"] *,
+section[data-testid="stSidebar"] [role="alert"] * {
+    color: #087b58 !important;
+}
+
 section[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    margin-top: -0.15rem;
+    padding: 0;
     border-radius: 0.8rem;
-    background: rgba(255, 255, 255, 0.72);
+    background: transparent !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+    padding: 0.75rem !important;
+    border: 1px solid rgba(186, 230, 253, 0.78) !important;
+    border-radius: 0.8rem !important;
+    background: #ffffff !important;
+}
+
+section[data-testid="stSidebar"]
+[data-testid="stFileUploaderDropzoneInstructions"] {
+    display: none !important;
+}
+
+.juriscloud-upload-formats {
+    margin: -0.35rem 0 0.2rem !important;
+    color: #718198 !important;
+    font-size: 0.68rem !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
+    white-space: nowrap;
 }
 
 section[data-testid="stSidebar"] button {
@@ -280,7 +305,7 @@ section[data-testid="stSidebar"] button {
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker) {
     border: 1px solid rgba(199, 220, 243, 0.92) !important;
     border-radius: 1.05rem !important;
-    background: rgba(252, 250, 255, 0.98) !important;
+    background: #ffffff !important;
     box-shadow:
         0 22px 48px -16px rgba(99, 102, 241, 0.29),
         0 12px 34px -8px rgba(14, 165, 233, 0.18),
@@ -310,7 +335,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-baseweb="textarea"] {
     border: 0 !important;
-    background: transparent !important;
+    background: #ffffff !important;
     box-shadow: none !important;
 }
 
@@ -320,7 +345,7 @@ textarea {
     padding: 0.35rem 0.25rem 0.75rem !important;
     border: 0 !important;
     outline: 0 !important;
-    background: transparent !important;
+    background: #ffffff !important;
     color: #334155 !important;
     font-size: 0.8rem !important;
     font-weight: 400 !important;
