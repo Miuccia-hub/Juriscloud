@@ -1,0 +1,59 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="64"
+    height="64"
+    viewBox="0 0 64 64"
+>
+    <rect
+        width="64"
+        height="64"
+        rx="16"
+        fill="#FDD7D0"
+    />
+
+    <rect
+        x="15"
+        y="19"
+        width="34"
+        height="28"
+        rx="7"
+        fill="none"
+        stroke="#10233F"
+        stroke-width="4"
+    />
+
+    <path
+        d="M32 19V12"
+        stroke="#10233F"
+        stroke-width="4"
+        stroke-linecap="round"
+    />
+
+    <circle
+        cx="32"
+        cy="10"
+        r="3"
+        fill="#10233F"
+    />
+
+    <circle
+        cx="25"
+        cy="32"
+        r="3"
+        fill="#10233F"
+    />
+
+    <circle
+        cx="39"
+        cy="32"
+        r="3"
+        fill="#10233F"
+    />
+
+    <path
+        d="M25 40H39"
+        stroke="#10233F"
+        stroke-width="4"
+        stroke-linecap="round"
+    />
+</svg>

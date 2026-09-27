@@ -15,6 +15,8 @@ from services.answer_generator import stream_grounded_answer
 from api_key import render_api_credentials_sidebar
 from auth import require_app_password
 import streamlit.components.v1 as components
+USER_AVATAR = "ui/user_avatar.svg"
+ASSISTANT_AVATAR = "ui/assistant_avatar.svg"
 
 
 st.set_page_config(
@@ -671,7 +673,16 @@ st.markdown(
 
 
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    avatar = (
+        USER_AVATAR
+        if message["role"] == "user"
+        else ASSISTANT_AVATAR
+    )
+
+    with st.chat_message(
+        message["role"],
+        avatar=avatar,
+    ):
         st.markdown(message["content"])
 
         if message["role"] == "assistant":
@@ -744,10 +755,16 @@ if user_question and vector_store is not None:
         }
     )
 
-    with st.chat_message("user"):
+    with st.chat_message(
+        "user",
+        avatar=USER_AVATAR,
+    ):
         st.markdown(user_question)
 
-    with st.chat_message("assistant"):
+    with st.chat_message(
+        "assistant",
+        avatar=ASSISTANT_AVATAR,
+    ):
         thinking_placeholder = st.empty()
         answer_placeholder = st.empty()
 
@@ -851,10 +868,10 @@ if user_question and vector_store is not None:
             answer_placeholder.error(complete_answer)
 
         st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": complete_answer,
-            "sources": verified_sources,
-        }
-    )
-       
+            {
+                "role": "assistant",
+                "content": complete_answer,
+                "sources": verified_sources,
+            }
+        )
+
