@@ -56,10 +56,10 @@ footer { display: none !important; }
 [data-testid="stMain"] { background: transparent !important; }
 
 .block-container {
-    width: min(100%, 58rem);
-    max-width: 58rem;
+    width: min(100%, 48rem);
+    max-width: 48rem;
     min-height: 100vh;
-    padding: clamp(4.75rem, 12vh, 7.25rem) 2.25rem 4rem;
+    padding: clamp(3.75rem, 9vh, 5.75rem) 1.5rem 4rem;
 }
 
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
@@ -68,8 +68,8 @@ footer { display: none !important; }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    width: 20rem !important;
-    min-width: 20rem !important;
+    width: 17rem !important;
+    min-width: 17rem !important;
     background: rgba(224, 242, 254, 0.5) !important;
     border-right: 1px solid rgba(186, 230, 253, 0.8);
 }
@@ -78,8 +78,14 @@ section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
     background: transparent !important;
 }
 
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+}
+
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
-    padding: 1.35rem 1rem 1.1rem;
+    padding: 1.15rem 1rem 1rem !important;
 }
 
 section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
@@ -234,7 +240,7 @@ section[data-testid="stSidebar"] button {
 
 /* Hero */
 .juriscloud-hero {
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.75rem;
     text-align: center;
 }
 
@@ -254,7 +260,7 @@ section[data-testid="stSidebar"] button {
     margin: 0;
     color: var(--jc-heading);
     font-family: "Newsreader", Georgia, serif !important;
-    font-size: clamp(2.45rem, 4.4vw, 3.35rem);
+    font-size: clamp(2.25rem, 3.2vw, 2.85rem);
     font-weight: 500;
     letter-spacing: -0.045em;
     line-height: 1.02;
@@ -274,11 +280,11 @@ section[data-testid="stSidebar"] button {
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker) {
     border: 1px solid rgba(199, 220, 243, 0.92) !important;
     border-radius: 1.05rem !important;
-    background: rgba(253, 252, 255, 0.96) !important;
+    background: rgba(252, 250, 255, 0.98) !important;
     box-shadow:
-        0 18px 42px -16px rgba(99, 102, 241, 0.22),
-        0 10px 30px -8px rgba(14, 165, 233, 0.13),
-        0 0 0 1px rgba(221, 214, 254, 0.46);
+        0 22px 48px -16px rgba(99, 102, 241, 0.29),
+        0 12px 34px -8px rgba(14, 165, 233, 0.18),
+        0 0 0 1px rgba(216, 208, 252, 0.62);
     transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
@@ -331,8 +337,27 @@ textarea::placeholder {
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stHorizontalBlock"] {
+    align-items: center;
+    gap: 0.5rem;
     padding-top: 0.62rem;
     border-top: 1px solid #edf2f7;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(4) {
+    flex: 1 1 auto !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(4) button {
+    width: 100% !important;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
