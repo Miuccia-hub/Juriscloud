@@ -14,22 +14,21 @@ from ui.styles import apply_styles
 from services.answer_generator import stream_grounded_answer
 from api_key import render_api_credentials_sidebar
 from auth import require_app_password
-import streamlit.components.v1 as components
 USER_AVATAR = "ui/user_avatar.svg"
 ASSISTANT_AVATAR = "ui/assistant_avatar.svg"
 
 
 st.set_page_config(
-    page_title="Jurisource",
-    page_icon="⚖️",
+    page_title="Juriscloud",
+    page_icon="💭",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
+apply_styles()
+
 if not require_app_password():
     st.stop()
-
-apply_styles()
 st.markdown(
     """
     <style>
@@ -374,9 +373,9 @@ with st.sidebar:
     st.markdown(
         """
         <div class="jurisource-brand">
-            <div class="jurisource-logo">⚖</div>
+            <div class="jurisource-logo">💭</div>
             <div>
-                <p class="jurisource-brand-name">Jurisource</p>
+                <p class="jurisource-brand-name">Juriscloud</p>
                 <p class="jurisource-brand-description">
                     Grounded legal research
                 </p>
@@ -512,6 +511,16 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
+    st.markdown(
+        """
+        <div class="jurisource-system-status">
+            <span class="jurisource-status-dot"></span>
+            <span>System ready</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 indexed_items = [
     item
@@ -535,123 +544,30 @@ vector_document_ids = {
 }
 
 
-header_column, language_column = st.columns([4, 1])
-
-with header_column:
-    st.markdown(
-        """
-        <div class="jurisource-header">
-            <h1>Research your legal sources</h1>
-            <p>
-                Ask grounded questions across legal articles, judgments,
-                contracts and reports.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with language_column:
-    st.selectbox(
-        "Language",
-        options=["English", "English + 中文"],
-        key="language_mode",
-    )
-if "_initial_scroll_complete" not in st.session_state:
-    components.html(
-        """
-        <script>
-            function scrollToAppTop() {
-                const doc = window.parent.document;
-
-                const targets = [
-                    doc.documentElement,
-                    doc.body,
-                    doc.querySelector('[data-testid="stAppViewContainer"]'),
-                    doc.querySelector('[data-testid="stMain"]'),
-                    doc.querySelector('.stMain')
-                ];
-
-                targets.forEach((element) => {
-                    if (element) {
-                        element.scrollTop = 0;
-                        element.scrollTo?.(0, 0);
-                    }
-                });
-
-                window.parent.scrollTo(0, 0);
-            }
-
-            setTimeout(scrollToAppTop, 100);
-            setTimeout(scrollToAppTop, 350);
-            setTimeout(scrollToAppTop, 800);
-        </script>
-        """,
-        height=0,
-    )
-
-    st.session_state["_initial_scroll_complete"] = True
-
-st.radio(
-    "Research mode",
-    options=["Single Document", "Multi-source Research"],
-    horizontal=True,
-    key="research_mode",
-)
-analysis_mode = st.selectbox(
-    "Answer depth",
-    options=["Standard", "Deep Analysis"],
-    key="analysis_mode",
-    help=(
-        "Standard uses GPT-4o. Deep Analysis uses GPT-5 Pro "
-        "and may take several minutes and cost substantially more."
-    ),
-)
-
 selected_file_keys: list[str] = []
 
 if available_file_keys:
-    if st.session_state.research_mode == "Single Document":
-        current_key = st.session_state.get(
-            "single_document_key"
-        )
+    current_key = st.session_state.get("single_document_key")
 
-        if current_key not in available_file_keys:
-            st.session_state.single_document_key = (
-                available_file_keys[0]
-            )
+    if current_key not in available_file_keys:
+        st.session_state.single_document_key = available_file_keys[0]
 
-        selected_key = st.selectbox(
-            "Document to research",
-            options=available_file_keys,
-            format_func=lambda key: document_names[key],
-            key="single_document_key",
-        )
-
-        selected_file_keys = [selected_key]
-
+    if "multi_document_keys" not in st.session_state:
+        st.session_state.multi_document_keys = available_file_keys.copy()
     else:
-        if "multi_document_keys" not in st.session_state:
-            st.session_state.multi_document_keys = (
-                available_file_keys.copy()
-            )
-        else:
-            valid_keys = [
-                key
-                for key in st.session_state.multi_document_keys
-                if key in available_file_keys
-            ]
-
-            st.session_state.multi_document_keys = (
-                valid_keys or available_file_keys.copy()
-            )
-
-        selected_file_keys = st.multiselect(
-            "Documents to research",
-            options=available_file_keys,
-            format_func=lambda key: document_names[key],
-            key="multi_document_keys",
+        valid_keys = [
+            key
+            for key in st.session_state.multi_document_keys
+            if key in available_file_keys
+        ]
+        st.session_state.multi_document_keys = (
+            valid_keys or available_file_keys.copy()
         )
+
+    if st.session_state.research_mode == "Single Document":
+        selected_file_keys = [st.session_state.single_document_key]
+    else:
+        selected_file_keys = st.session_state.multi_document_keys
 
 
 selected_document_ids = [
@@ -660,17 +576,210 @@ selected_document_ids = [
     if vector_document_ids.get(file_key)
 ]
 
+language_spacer, language_column = st.columns([5.4, 1])
+
+with language_column:
+    st.selectbox(
+        "Language",
+        options=["English", "English + 中文"],
+        key="language_mode",
+    )
 
 st.markdown(
     """
-    <div class="jurisource-disclaimer">
-        🛡️ For research assistance only — not legal advice.
-        Answers will be grounded in the documents you select.
+<div class="juriscloud-hero">
+    <div class="juriscloud-hero-title">
+        <span class="juriscloud-hero-cloud">💭</span>
+        <h1>Upload document and ask</h1>
     </div>
+    <p>Grounded legal research powered by Juriscloud Chunk Retrieval.</p>
+</div>
     """,
     unsafe_allow_html=True,
 )
 
+composer = st.container(border=True)
+composer.markdown(
+    '<div class="juriscloud-composer-marker"></div>',
+    unsafe_allow_html=True,
+)
+
+question_draft = composer.text_area(
+    "Question",
+    placeholder="Ask a question about your indexed document chunks…",
+    key="juriscloud_question_draft",
+    height=108,
+    label_visibility="collapsed",
+)
+
+control_columns = composer.columns(
+    [0.28, 1.05, 1.15, 1.65, 0.34],
+    gap="small",
+)
+
+with control_columns[0]:
+    upload_help_clicked = st.button(
+        "＋",
+        key="juriscloud_upload_help",
+        help="Upload source documents from the sidebar.",
+    )
+
+with control_columns[1]:
+    with st.popover(
+        "▱ "
+        + (
+            "Single Doc"
+            if st.session_state.research_mode == "Single Document"
+            else "Multi-source"
+        ),
+        use_container_width=True,
+    ):
+        st.radio(
+            "Research mode",
+            options=["Single Document", "Multi-source Research"],
+            key="research_mode",
+        )
+
+with control_columns[2]:
+    with st.popover(
+        "☷ " + st.session_state.analysis_mode,
+        use_container_width=True,
+    ):
+        st.selectbox(
+            "Answer depth",
+            options=["Standard", "Deep Analysis"],
+            key="analysis_mode",
+            help=(
+                "Standard uses GPT-4o. Deep Analysis uses GPT-5 Pro "
+                "and may take several minutes and cost substantially more."
+            ),
+        )
+
+with control_columns[3]:
+    if available_file_keys:
+        if st.session_state.research_mode == "Single Document":
+            current_document_name = document_names[
+                st.session_state.single_document_key
+            ]
+
+            with st.popover(
+                f"▤ {current_document_name}",
+                use_container_width=True,
+            ):
+                st.selectbox(
+                    "Active document",
+                    options=available_file_keys,
+                    format_func=lambda key: document_names[key],
+                    key="single_document_key",
+                )
+        else:
+            document_count = len(
+                st.session_state.multi_document_keys
+            )
+
+            with st.popover(
+                f"▤ {document_count} documents",
+                use_container_width=True,
+            ):
+                st.multiselect(
+                    "Active documents",
+                    options=available_file_keys,
+                    format_func=lambda key: document_names[key],
+                    key="multi_document_keys",
+                )
+    else:
+        st.button(
+            "▤ Upload a document",
+            disabled=True,
+            use_container_width=True,
+            key="juriscloud_no_document",
+        )
+
+with control_columns[4]:
+    send_clicked = st.button(
+        "↑",
+        type="primary",
+        use_container_width=True,
+        disabled=(
+            not selected_document_ids
+            or vector_store is None
+            or not question_draft.strip()
+        ),
+        key="juriscloud_send",
+    )
+
+if upload_help_clicked:
+    composer.caption(
+        "Use the Document library in the left sidebar to upload sources."
+    )
+
+suggestion_columns = st.columns(3, gap="small")
+suggested_question: str | None = None
+suggestions_disabled = (
+    not selected_document_ids
+    or vector_store is None
+)
+
+with suggestion_columns[0]:
+    if st.button(
+        "⚖ What remedies does a buyer have?",
+        use_container_width=True,
+        disabled=suggestions_disabled,
+        key="suggestion_buyer_remedies",
+    ):
+        suggested_question = (
+            "What remedies does a buyer have under this document?"
+        )
+
+with suggestion_columns[1]:
+    if st.button(
+        "📄 What is this document about?",
+        use_container_width=True,
+        disabled=suggestions_disabled,
+        key="suggestion_document_summary",
+    ):
+        suggested_question = "What is this document about?"
+
+with suggestion_columns[2]:
+    if st.button(
+        "🛡 What are the key legal issues?",
+        use_container_width=True,
+        disabled=suggestions_disabled,
+        key="suggestion_legal_issues",
+    ):
+        suggested_question = (
+            "What are the key legal issues in this document?"
+        )
+
+st.markdown(
+    """
+<p class="juriscloud-grounded-caption">
+    Grounded Chatbot · Responses use semantic retrieval over document chunks.
+</p>
+    """,
+    unsafe_allow_html=True,
+)
+
+if not indexed_items:
+    if uploaded_files:
+        st.warning(
+            "The uploaded documents could not be indexed. "
+            "Review the document-library messages."
+        )
+    else:
+        st.info(
+            "Upload a legal document from the sidebar to begin."
+        )
+
+st.markdown(
+    """
+<div class="jurisource-disclaimer">
+    🛡️ For research assistance only — not legal advice.
+    Answers are grounded in the documents you select.
+</div>
+    """,
+    unsafe_allow_html=True,
+)
 
 for message in st.session_state.messages:
     avatar = (
@@ -679,70 +788,16 @@ for message in st.session_state.messages:
         else ASSISTANT_AVATAR
     )
 
-    with st.chat_message(
-        message["role"],
-        avatar=avatar,
-    ):
+    with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
         if message["role"] == "assistant":
-            render_source_evidence(
-                message.get("sources", [])
-            )
+            render_source_evidence(message.get("sources", []))
 
-
-if not st.session_state.messages:
-    if indexed_items:
-        st.markdown(
-            f"""
-            <div class="jurisource-empty">
-                <div class="jurisource-empty-icon">✅</div>
-                <h3>Your legal sources are searchable</h3>
-                <p>
-                    {len(selected_document_ids)} document(s) selected.
-                    Ask a question to test source retrieval.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    elif uploaded_files:
-        st.markdown(
-            """
-            <div class="jurisource-empty">
-                <div class="jurisource-empty-icon">⚠️</div>
-                <h3>The documents could not be indexed</h3>
-                <p>
-                    Review the messages in the document library.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    else:
-        st.markdown(
-            """
-            <div class="jurisource-empty">
-                <div class="jurisource-empty-icon">📚</div>
-                <h3>Begin with your legal sources</h3>
-                <p>
-                    Upload one or more PDF, TXT, DOCX or DOC files
-                    from the document library.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-
-user_question = st.chat_input(
-    "Ask a question about your selected sources…",
-    disabled=(
-        not selected_document_ids
-        or vector_store is None
-    ),
+user_question = (
+    question_draft.strip()
+    if send_clicked and question_draft.strip()
+    else suggested_question
 )
 
 if user_question and vector_store is not None:
@@ -861,7 +916,7 @@ if user_question and vector_store is not None:
             thinking_placeholder.empty()
 
             complete_answer = (
-                "Jurisource could not generate an answer. "
+                "Juriscloud could not generate an answer. "
                 f"Technical detail: {error}"
             )
 
@@ -874,4 +929,3 @@ if user_question and vector_store is not None:
                 "sources": verified_sources,
             }
         )
-

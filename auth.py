@@ -21,7 +21,7 @@ def require_app_password() -> bool:
         )
         return False
 
-    st.title("Jurisource")
+    st.title("Juriscloud")
     st.caption(
         "Enter the application password to continue."
     )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 
-JURISOURCE_API_OPTION = "Use Jurisource API access"
+JURISOURCE_API_OPTION = "Use Juriscloud API access"
 PERSONAL_API_OPTION = "Use my own OpenAI API key"
 
 
@@ -64,18 +64,18 @@ def render_api_credentials_sidebar() -> str | None:
             ).strip()
         except KeyError:
             st.sidebar.error(
-                "The Jurisource API key has not been configured."
+                "The Juriscloud API key has not been configured."
             )
             return None
 
         if not application_api_key:
             st.sidebar.error(
-                "The Jurisource API key is empty."
+                "The Juriscloud API key is empty."
             )
             return None
 
         st.sidebar.success(
-            "Using API access provided by Jurisource."
+            "Using API access provided by Juriscloud."
         )
         st.sidebar.caption(
             "API usage will be charged to the application owner."
