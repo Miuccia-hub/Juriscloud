@@ -423,10 +423,10 @@ with st.sidebar:
         <div class="jurisource-brand">
             <div class="jurisource-logo">💭</div>
             <div>
-                <p class="jurisource-brand-name"
-   style="font-size: 1.12rem !important;">
-    Juriscloud
-</p>
+                <div class="jurisource-brand-name"
+                     style="font-size: 1.3rem !important;">
+                    Juriscloud
+                </div>
                 <p class="jurisource-brand-description">
                     Grounded legal research
                 </p>
@@ -444,11 +444,12 @@ with st.sidebar:
         "Upload legal documents",
         type=["pdf", "txt", "docx"],
         accept_multiple_files=True,
-        help="Upload up to 10 files. Maximum size: 25 MB per file.",
+        max_upload_size=100,
+        help="Upload up to 10 files. Maximum size: 100 MB per file.",
     )
     st.markdown(
         '<p class="juriscloud-upload-formats">'
-        '25MB per file · PDF, TXT, DOCX'
+        '100MB per file · PDF, TXT, DOCX'
         '</p>',
         unsafe_allow_html=True,
     )
@@ -461,19 +462,19 @@ with st.sidebar:
         oversized_names = [
             uploaded_file.name
             for uploaded_file in uploaded_files
-            if uploaded_file.size > 25 * 1024 * 1024
+            if uploaded_file.size > 100 * 1024 * 1024
         ]
 
         if oversized_names:
             st.error(
-                "These files exceed 25 MB: "
+                "These files exceed 100 MB: "
                 + ", ".join(oversized_names)
             )
 
             uploaded_files = [
                 uploaded_file
                 for uploaded_file in uploaded_files
-                if uploaded_file.size <= 25 * 1024 * 1024
+                if uploaded_file.size <= 100 * 1024 * 1024
             ]
 
         with st.spinner("Reading your legal documents..."):
@@ -656,9 +657,36 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+conversation_region = st.container()
+
+with conversation_region:
+    for message in st.session_state.messages:
+        avatar = (
+            USER_AVATAR
+            if message["role"] == "user"
+            else ASSISTANT_AVATAR
+        )
+
+        with st.chat_message(message["role"], avatar=avatar):
+            st.markdown(message["content"])
+
+            if message["role"] == "assistant":
+                render_source_evidence(message.get("sources", []))
+
+has_conversation = bool(st.session_state.messages)
+
+if st.session_state.pop("juriscloud_clear_question_on_next_run", False):
+    st.session_state.juriscloud_question_draft = ""
+
+auto_submit_question = bool(
+    st.session_state.pop("juriscloud_auto_submit_question", False)
+)
+
 composer = st.container(border=True)
 composer.markdown(
-    '<div class="juriscloud-composer-marker"></div>',
+    '<div class="juriscloud-composer-marker '
+    + ('is-compact' if has_conversation else 'is-expanded')
+    + '"></div>',
     unsafe_allow_html=True,
 )
 
@@ -674,7 +702,7 @@ question_draft = composer.text_area(
     "Question",
     placeholder="Ask a question about your indexed document chunks…",
     key="juriscloud_question_draft",
-    height=88,
+    height=56 if has_conversation else 88,
     label_visibility="collapsed",
 )
 
@@ -820,7 +848,6 @@ with control_columns[4]:
         disabled=(
             not selected_document_ids
             or vector_store is None
-            or not question_draft.strip()
         ),
         key="juriscloud_send",
     )
@@ -830,42 +857,53 @@ if st.session_state.get("juriscloud_image_extraction_notice"):
         st.session_state.pop("juriscloud_image_extraction_notice")
     )
 
-suggestion_columns = st.columns(3, gap="small")
-suggested_question: str | None = None
 suggestions_disabled = (
     not selected_document_ids
     or vector_store is None
 )
 
-with suggestion_columns[0]:
-    if st.button(
-        "⚖ What remedies does a buyer have?",
-        use_container_width=True,
-        disabled=suggestions_disabled,
-        key="suggestion_buyer_remedies",
-    ):
-        suggested_question = (
-            "What remedies does a buyer have under this document?"
+def queue_suggested_question(question: str) -> None:
+    """Fill the composer and submit a suggested question."""
+
+    st.session_state.juriscloud_question_draft = question
+    st.session_state.juriscloud_auto_submit_question = True
+
+
+if not has_conversation:
+    suggestion_columns = st.columns(3, gap="small")
+
+    with suggestion_columns[0]:
+        st.button(
+            "⚖ What remedies does a buyer have?",
+            use_container_width=True,
+            disabled=suggestions_disabled,
+            key="suggestion_buyer_remedies",
+            on_click=queue_suggested_question,
+            args=(
+                "What remedies does a buyer have under this document?",
+            ),
         )
 
-with suggestion_columns[1]:
-    if st.button(
-        "📄 What is this document about?",
-        use_container_width=True,
-        disabled=suggestions_disabled,
-        key="suggestion_document_summary",
-    ):
-        suggested_question = "What is this document about?"
+    with suggestion_columns[1]:
+        st.button(
+            "📄 What is this document about?",
+            use_container_width=True,
+            disabled=suggestions_disabled,
+            key="suggestion_document_summary",
+            on_click=queue_suggested_question,
+            args=("What is this document about?",),
+        )
 
-with suggestion_columns[2]:
-    if st.button(
-        "🛡 What are the key legal issues?",
-        use_container_width=True,
-        disabled=suggestions_disabled,
-        key="suggestion_legal_issues",
-    ):
-        suggested_question = (
-            "What are the key legal issues in this document?"
+    with suggestion_columns[2]:
+        st.button(
+            "🛡 What are the key legal issues?",
+            use_container_width=True,
+            disabled=suggestions_disabled,
+            key="suggestion_legal_issues",
+            on_click=queue_suggested_question,
+            args=(
+                "What are the key legal issues in this document?",
+            ),
         )
 
 if not indexed_items:
@@ -889,23 +927,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-for message in st.session_state.messages:
-    avatar = (
-        USER_AVATAR
-        if message["role"] == "user"
-        else ASSISTANT_AVATAR
-    )
-
-    with st.chat_message(message["role"], avatar=avatar):
-        st.markdown(message["content"])
-
-        if message["role"] == "assistant":
-            render_source_evidence(message.get("sources", []))
-
 user_question = (
     question_draft.strip()
-    if send_clicked and question_draft.strip()
-    else suggested_question
+    if (send_clicked or auto_submit_question) and question_draft.strip()
+    else None
 )
 
 if user_question and vector_store is not None:
@@ -918,16 +943,20 @@ if user_question and vector_store is not None:
         }
     )
 
-    with st.chat_message(
-        "user",
-        avatar=USER_AVATAR,
-    ):
+    with conversation_region:
+        live_user_message = st.chat_message(
+            "user",
+            avatar=USER_AVATAR,
+        )
+        live_assistant_message = st.chat_message(
+            "assistant",
+            avatar=ASSISTANT_AVATAR,
+        )
+
+    with live_user_message:
         st.markdown(user_question)
 
-    with st.chat_message(
-        "assistant",
-        avatar=ASSISTANT_AVATAR,
-    ):
+    with live_assistant_message:
         thinking_placeholder = st.empty()
         answer_placeholder = st.empty()
 
@@ -1037,3 +1066,6 @@ if user_question and vector_store is not None:
                 "sources": verified_sources,
             }
         )
+
+    st.session_state.juriscloud_clear_question_on_next_run = True
+    st.rerun()

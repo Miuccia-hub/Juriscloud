@@ -7,7 +7,8 @@ textColor = "#10233F"
 font = "sans-serif"
 
 [server]
-maxUploadSize = 25
+maxUploadSize = 100
+maxMessageSize = 200
 
 [browser]
 gatherUsageStats = false

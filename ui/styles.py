@@ -267,11 +267,10 @@ section[data-testid="stSidebar"] hr {
     box-shadow: none;
 }
 
-section[data-testid="stSidebar"]
-[data-testid="stMarkdownContainer"] p.jurisource-brand-name {
+section[data-testid="stSidebar"] .jurisource-brand-name {
     margin: 0;
     color: var(--jc-heading) !important;
-    font-size: 1.2rem !important;
+    font-size: 1.3rem !important;
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.018em;
@@ -351,14 +350,17 @@ section[data-testid="stSidebar"] button p {
     border-radius: 0.72rem;
     background: rgba(255, 255, 255, 0.84);
     color: #475569;
-    font-size: 0.72rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.45;
 }
 
 .jurisource-file-meta {
     margin-top: 0.2rem;
     color: var(--jc-faint);
-    font-size: 0.62rem;
-    line-height: 1.45;
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 .jurisource-system-status {
@@ -582,6 +584,30 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
     box-shadow: 0 7px 16px rgba(37, 99, 235, 0.22);
 }
 
+/* Streamlit only sends textarea changes after blur/submit. Use the browser's
+   placeholder state so the send button responds visually while typing. */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(
+    .juriscloud-composer-marker
+):has(textarea:placeholder-shown)
+[data-testid="stBaseButton-primary"]:not(:disabled) {
+    border-color: #d9e4ef !important;
+    background: #e8f0f7 !important;
+    color: #94a3b8 !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(
+    .juriscloud-composer-marker
+):has(textarea:not(:placeholder-shown))
+[data-testid="stBaseButton-primary"]:not(:disabled) {
+    border-color: var(--jc-primary) !important;
+    background: var(--jc-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 7px 16px rgba(37, 99, 235, 0.22) !important;
+    pointer-events: auto !important;
+}
+
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stBaseButton-primary"]:hover {
     border-color: var(--jc-primary-dark);
@@ -634,8 +660,33 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stChatMessage"] p,
 [data-testid="stChatMessage"] li {
     color: #475569;
-    font-size: 0.78rem;
-    line-height: 1.7;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+[data-testid="stChatMessage"] h1,
+[data-testid="stChatMessage"] h2,
+[data-testid="stChatMessage"] h3,
+[data-testid="stChatMessage"] h4 {
+    line-height: 1.4;
+}
+
+/* After the first exchange, keep the composer below the conversation and
+   reduce only its vertical footprint, like a conventional AI chat. */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(
+    .juriscloud-composer-marker.is-compact
+) > div {
+    padding-top: 0.7rem !important;
+    padding-bottom: 0.68rem !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(
+    .juriscloud-composer-marker.is-compact
+) textarea {
+    min-height: 2.9rem !important;
+    height: 2.9rem !important;
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.35rem !important;
 }
 
 .jurisource-thinking {
@@ -648,6 +699,8 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
     border-radius: 0.9rem;
     background: rgba(240, 249, 255, 0.88);
     color: #315e7f;
+    margin: 0.1rem 0 0.7rem;
+    box-sizing: border-box;
 }
 
 .jurisource-thinking-text {
