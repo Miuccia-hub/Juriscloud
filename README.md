@@ -1,4 +1,4 @@
-# ☁️ Juriscloud
+# 💭 Juriscloud
 
 Grounded legal research, with verifiable citations.
 
