@@ -424,7 +424,7 @@ with st.sidebar:
             <div class="jurisource-logo">💭</div>
             <div>
                 <p class="jurisource-brand-name"
-   style="font-size: 1.2rem !important;">
+   style="font-size: 1.12rem !important;">
     Juriscloud
 </p>
                 <p class="jurisource-brand-description">
