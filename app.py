@@ -637,6 +637,7 @@ with language_column:
         "Language",
         options=["English", "English + 中文"],
         key="language_mode",
+        label_visibility="collapsed",
     )
 
 st.markdown(
@@ -646,7 +647,7 @@ st.markdown(
         <span class="juriscloud-hero-cloud">💭</span>
         <h1>Upload document and ask</h1>
     </div>
-    <p>Grounded legal research powered by Juriscloud Chunk Retrieval.</p>
+    <p>Grounded Chatbot · Responses use semantic retrieval over document chunks.</p>
 </div>
     """,
     unsafe_allow_html=True,
@@ -670,17 +671,17 @@ question_draft = composer.text_area(
     "Question",
     placeholder="Ask a question about your indexed document chunks…",
     key="juriscloud_question_draft",
-    height=108,
+    height=88,
     label_visibility="collapsed",
 )
 
 control_columns = composer.columns(
-    [0.28, 1.05, 1.15, 1.65, 0.34],
+    [0.68, 1.05, 1.15, 1.65, 0.34],
     gap="small",
 )
 
 with control_columns[0]:
-    with st.popover("🖼"):
+    with st.popover("Image"):
         st.caption("Upload an image and extract its visible text with AI.")
         uploaded_image = st.file_uploader(
             "Image for text extraction",
@@ -863,15 +864,6 @@ with suggestion_columns[2]:
         suggested_question = (
             "What are the key legal issues in this document?"
         )
-
-st.markdown(
-    """
-<p class="juriscloud-grounded-caption">
-    Grounded Chatbot · Responses use semantic retrieval over document chunks.
-</p>
-    """,
-    unsafe_allow_html=True,
-)
 
 if not indexed_items:
     if uploaded_files:

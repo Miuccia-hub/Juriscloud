@@ -38,28 +38,104 @@ html, body, [class*="css"], .stApp, button, input, textarea, select {
 /* Remove Streamlit's blank application header. It remains after deployment
    unless it is explicitly collapsed. */
 [data-testid="stHeader"] {
-    height: 0 !important;
-    min-height: 0 !important;
+    height: 2.6rem !important;
+    min-height: 2.6rem !important;
     background: transparent !important;
+    pointer-events: none !important;
+    overflow: visible !important;
 }
 
-[data-testid="stToolbar"],
+[data-testid="stHeader"] button,
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stExpandSidebarButton"],
+[data-testid="stSidebarCollapseButton"] {
+    pointer-events: auto !important;
+}
+
+/* Keep the reopen control available after the sidebar is collapsed. */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"] {
+    position: fixed !important;
+    top: 0.72rem !important;
+    left: 0.72rem !important;
+    z-index: 1000000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    border: 1px solid rgba(186, 230, 253, 0.92) !important;
+    border-radius: 0.72rem !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 6px 18px rgba(71, 85, 105, 0.12) !important;
+}
+
 [data-testid="stDecoration"],
 #MainMenu,
 footer { display: none !important; }
+
+/* Current Streamlit renders the reopen control inside stToolbar. */
+[data-testid="stToolbar"] {
+    display: flex !important;
+    visibility: visible !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+}
+
+[data-testid="stToolbar"] [data-testid="stAppDeployButton"],
+[data-testid="stToolbar"] [data-testid="stStatusWidget"],
+[data-testid="stToolbar"] [data-testid="stMainMenu"] {
+    display: none !important;
+}
+
+[data-testid="stExpandSidebarButton"],
+[data-testid="stSidebarCollapseButton"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+[data-testid="stExpandSidebarButton"] {
+    position: fixed !important;
+    top: 0.72rem !important;
+    left: 0.72rem !important;
+    z-index: 1000001 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    border: 1px solid rgba(186, 230, 253, 0.92) !important;
+    border-radius: 0.72rem !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    box-shadow: 0 6px 18px rgba(71, 85, 105, 0.12) !important;
+}
+
+[data-testid="stExpandSidebarButton"] button,
+[data-testid="stSidebarCollapseButton"] button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    min-height: 2.3rem !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
 
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"] { background: var(--jc-page) !important; }
 
 .block-container {
-    width: min(100%, 48rem);
-    max-width: 48rem;
-    min-height: 100vh;
-    padding: 1.65rem 1.5rem 4rem;
+    width: min(100%, 52rem);
+    max-width: 52rem;
+    min-height: auto;
+    padding: 1.45rem 1.65rem 2rem;
 }
 
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
-    gap: 1rem;
+    gap: 0.86rem;
 }
 
 /* Sidebar */
@@ -75,18 +151,52 @@ section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
 }
 
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
-    height: 0 !important;
-    min-height: 0 !important;
+    position: absolute !important;
+    top: 0.45rem !important;
+    right: 0.45rem !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    min-height: 2.3rem !important;
     padding: 0 !important;
+    overflow: visible !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    min-height: 2.3rem !important;
+    padding: 0 !important;
+    border: 1px solid rgba(186, 230, 253, 0.9) !important;
+    border-radius: 0.72rem !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    overflow: visible !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    overflow: visible !important;
 }
 
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
-    padding: 1.15rem 1rem 1rem !important;
-    transform: translateY(-2.75rem);
+    padding: 1rem 1rem 1rem !important;
+    transform: none !important;
 }
 
 section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-    gap: 0.9rem;
+    gap: 0.82rem;
 }
 
 section[data-testid="stSidebar"] h1,
@@ -95,9 +205,11 @@ section[data-testid="stSidebar"] h3 {
     margin: 0;
     padding: 0;
     color: #334155;
-    font-size: 0.82rem;
+    font-size: 0.83rem;
     font-weight: 700;
-    letter-spacing: 0.035em;
+    line-height: 1.35;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
 }
 
 section[data-testid="stSidebar"] p,
@@ -105,14 +217,23 @@ section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
 section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
     color: var(--jc-muted);
+    font-size: 0.81rem;
+    line-height: 1.5;
+}
+
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p,
+section[data-testid="stSidebar"] .stMarkdown p {
+    font-size: 0.81rem !important;
+    line-height: 1.5 !important;
 }
 
 section[data-testid="stSidebar"] label p,
 section[data-testid="stSidebar"] [role="radiogroup"] p {
     color: #526176 !important;
-    font-size: 0.76rem !important;
+    font-size: 0.79rem !important;
     font-weight: 500 !important;
-    line-height: 1.35 !important;
+    line-height: 1.45 !important;
 }
 
 section[data-testid="stSidebar"] hr {
@@ -124,7 +245,9 @@ section[data-testid="stSidebar"] hr {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    margin: 0 0 0.9rem;
+    margin: 0 0 0.5rem;
+    padding: 0.15rem 0 1.15rem;
+    border-bottom: 1px solid rgba(186, 230, 253, 0.78);
 }
 
 .jurisource-logo {
@@ -139,7 +262,7 @@ section[data-testid="stSidebar"] hr {
     border-radius: 0;
     background: transparent;
     color: inherit;
-    font-size: 1.55rem;
+    font-size: 1.65rem;
     line-height: 1;
     box-shadow: none;
 }
@@ -147,7 +270,7 @@ section[data-testid="stSidebar"] hr {
 .jurisource-brand-name {
     margin: 0;
     color: var(--jc-heading) !important;
-    font-size: 0.95rem;
+    font-size: 2rem;
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.018em;
@@ -156,7 +279,7 @@ section[data-testid="stSidebar"] hr {
 .jurisource-brand-description {
     margin: 0.22rem 0 0;
     color: var(--jc-muted) !important;
-    font-size: 0.68rem;
+    font-size: 0.81rem;
     font-weight: 500;
     line-height: 1.3;
 }
@@ -166,12 +289,16 @@ section[data-testid="stSidebar"] [data-testid="stAlert"] {
     border-radius: 0.75rem;
     background: #ecfdf5 !important;
     color: #087b58 !important;
-    font-size: 0.7rem;
+    padding: 0.85rem 0.9rem !important;
+    font-size: 0.79rem;
+    line-height: 1.5;
 }
 
 section[data-testid="stSidebar"] [data-testid="stAlert"] *,
 section[data-testid="stSidebar"] [role="alert"] * {
     color: #087b58 !important;
+    font-size: 0.79rem !important;
+    line-height: 1.5 !important;
 }
 
 section[data-testid="stSidebar"] [data-testid="stFileUploader"] {
@@ -196,7 +323,7 @@ section[data-testid="stSidebar"]
 .juriscloud-upload-formats {
     margin: -0.35rem 0 0.2rem !important;
     color: #718198 !important;
-    font-size: 0.68rem !important;
+    font-size: 0.76rem !important;
     font-weight: 400 !important;
     line-height: 1.35 !important;
     white-space: nowrap;
@@ -207,7 +334,12 @@ section[data-testid="stSidebar"] button {
     border-radius: 0.72rem;
     background: rgba(255, 255, 255, 0.82);
     color: #475569;
-    font-size: 0.72rem;
+    font-size: 0.79rem;
+}
+
+section[data-testid="stSidebar"] button p {
+    font-size: 0.79rem !important;
+    line-height: 1.35 !important;
 }
 
 .jurisource-file {
@@ -238,7 +370,7 @@ section[data-testid="stSidebar"] button {
     border-radius: 0.72rem;
     background: rgba(255, 255, 255, 0.72);
     color: #64748b;
-    font-size: 0.61rem;
+    font-size: 0.69rem;
     font-weight: 700;
     letter-spacing: 0.055em;
     text-transform: uppercase;
@@ -265,7 +397,7 @@ section[data-testid="stSidebar"] button {
 
 /* Hero */
 .juriscloud-hero {
-    margin: 0 auto 1.75rem;
+    margin: 0 auto 1.55rem;
     text-align: center;
 }
 
@@ -293,10 +425,10 @@ section[data-testid="stSidebar"] button {
 
 .juriscloud-hero p {
     max-width: 34rem;
-    margin: 0.8rem auto 0;
+    margin: 0.75rem auto 0;
     color: #718198;
     font-family: "Plus Jakarta Sans", sans-serif !important;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 400;
     line-height: 1.55;
 }
@@ -322,7 +454,8 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker) > div {
-    padding: 0.82rem 0.95rem 0.86rem !important;
+    padding: 1rem 1.05rem 0.95rem !important;
+    background: #ffffff !important;
 }
 
 .juriscloud-composer-marker { display: none; }
@@ -331,18 +464,25 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stTextArea"] { margin: 0; }
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stTextArea"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stTextArea"] > div,
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
-[data-baseweb="textarea"] {
+[data-testid="stTextArea"] > div > div,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-baseweb="textarea"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-baseweb="base-input"] {
     border: 0 !important;
     background: #ffffff !important;
+    background-color: #ffffff !important;
     box-shadow: none !important;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 textarea {
-    min-height: 7rem !important;
-    padding: 0.35rem 0.25rem 0.75rem !important;
+    min-height: 6.4rem !important;
+    padding: 0.45rem 0.3rem 0.7rem !important;
     border: 0 !important;
     outline: 0 !important;
     background: #ffffff !important;
@@ -354,6 +494,15 @@ textarea {
     resize: none !important;
 }
 
+/* Override Streamlit/BaseWeb's tinted textarea surface. */
+[data-testid="stMainBlockContainer"] [data-testid="stTextArea"],
+[data-testid="stMainBlockContainer"] [data-testid="stTextArea"] > div,
+[data-testid="stMainBlockContainer"] [data-testid="stTextArea"] [data-baseweb="base-input"],
+[data-testid="stMainBlockContainer"] [data-testid="stTextArea"] textarea {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+}
+
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 textarea::placeholder {
     color: #94a3b8 !important;
@@ -363,8 +512,8 @@ textarea::placeholder {
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 [data-testid="stHorizontalBlock"] {
     align-items: center;
-    gap: 0.5rem;
-    padding-top: 0.62rem;
+    gap: 0.4rem;
+    padding-top: 0.72rem;
     border-top: 1px solid #edf2f7;
 }
 
@@ -373,6 +522,20 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
     width: auto !important;
     min-width: 0 !important;
     flex: 0 0 auto !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {
+    width: 5.8rem !important;
+    min-width: 5.8rem !important;
+    flex: 0 0 5.8rem !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child button {
+    width: 100% !important;
+    padding-right: 0.4rem !important;
+    padding-left: 0.4rem !important;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
@@ -445,17 +608,9 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
     color: #0369a1;
 }
 
-.juriscloud-grounded-caption {
-    margin: 0.08rem 0 0.2rem;
-    color: #94a3b8;
-    font-size: 0.63rem;
-    font-weight: 400;
-    text-align: center;
-}
-
 .jurisource-disclaimer {
-    margin: 0.15rem 0 0.65rem;
-    padding: 0.65rem 0.82rem;
+    margin: 0.05rem 0 0.3rem;
+    padding: 0.48rem 0.72rem;
     border: 1px solid rgba(186, 230, 253, 0.72);
     border-radius: 0.72rem;
     background: rgba(224, 242, 254, 0.58);
@@ -500,10 +655,23 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
 }
 
 @media (max-width: 900px) {
-    .block-container { padding: 3.5rem 1.1rem 3rem; }
+    .block-container { padding: 1rem 1.1rem 2rem; }
     .juriscloud-hero { margin-bottom: 1.4rem; }
     .juriscloud-hero h1 { font-size: 2.1rem; }
     .juriscloud-hero-cloud { font-size: 1.75rem; }
+}
+
+/* Preserve the one-screen layout on shorter laptop viewports. */
+@media (max-height: 850px) and (min-width: 901px) {
+    .block-container { padding-top: 0.85rem; padding-bottom: 1rem; }
+    [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+        gap: 0.62rem;
+    }
+    .juriscloud-hero { margin-bottom: 0.95rem; }
+    .juriscloud-hero p { margin-top: 0.5rem; }
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(.juriscloud-composer-marker)
+    textarea { min-height: 5.45rem !important; }
+    .jurisource-disclaimer { margin-bottom: 0.15rem; }
 }
 </style>
         """,
