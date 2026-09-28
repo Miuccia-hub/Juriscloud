@@ -271,7 +271,7 @@ section[data-testid="stSidebar"]
 [data-testid="stMarkdownContainer"] p.jurisource-brand-name {
     margin: 0;
     color: var(--jc-heading) !important;
-    font-size: 2rem !important;
+    font-size: 1.2rem !important;
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.018em;
