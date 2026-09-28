@@ -267,7 +267,8 @@ section[data-testid="stSidebar"] hr {
     box-shadow: none;
 }
 
-.jurisource-brand-name {
+section[data-testid="stSidebar"]
+[data-testid="stMarkdownContainer"] p.jurisource-brand-name {
     margin: 0;
     color: var(--jc-heading) !important;
     font-size: 2rem !important;
