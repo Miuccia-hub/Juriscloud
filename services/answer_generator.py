@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from services.vector_store import SearchResult
+from services.legal_sections import requested_articles
 
 
 load_dotenv()
@@ -27,6 +28,7 @@ def _build_source_context(
                     f"<source id=\"S{number}\">",
                     f"Document: {result.filename}",
                     f"Location: {result.citation_label}",
+                    f"Provision: Article {result.article_number}" if result.article_number else "Provision: unspecified",
                     "Passage:",
                     result.text,
                     "</source>",
@@ -98,6 +100,14 @@ def stream_grounded_answer(
             "An OpenAI API key is required."
         )
 
+    articles = requested_articles(question)
+    if articles and not set(articles).issubset({r.article_number for r in search_results}):
+        missing = ", ".join(f"Article {number}" for number in articles)
+        yield f"I could not locate the actual text of {missing} in the selected documents. Please check the document selection."
+        if language_mode == "English + 中文":
+            yield "\n\n未能在所选文档中定位到所问条文的正文，请确认选择了正确的文档。"
+        return
+
     if not search_results:
         yield (
             "I could not find enough relevant material in the selected "
@@ -144,6 +154,11 @@ Mandatory rules:
 11. Do not create a Sources, References or Bibliography section. The
     application will append a verified source list automatically.
 12. Preserve relevant legal terminology and qualifications from the sources.
+13. For a numbered-article question, use the supplied Provision metadata to
+    identify the actual article. A paragraph numbered 5 or a cross-reference
+    to another regulation's Article 5 is not the requested article.
+14. Use the uploaded document's version, including amendments. Earlier
+    conversation is context only, never evidence for a legal claim.
 """.strip()
 
     evidence = _build_source_context(search_results)

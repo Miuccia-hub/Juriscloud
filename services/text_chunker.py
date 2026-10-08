@@ -5,6 +5,7 @@ from hashlib import sha256
 from typing import Any
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from services.legal_sections import article_units
 
 
 @dataclass(frozen=True)
@@ -18,6 +19,7 @@ class DocumentChunk:
     chunk_index: int
     page_number: int | None = None
     section: str | None = None
+    article_number: str | None = None
 
     @property
     def word_count(self) -> int:
@@ -46,6 +48,9 @@ class DocumentChunk:
 
         if self.section:
             metadata["section"] = self.section
+
+        if self.article_number:
+            metadata["article_number"] = self.article_number
 
         return metadata
 
@@ -223,7 +228,8 @@ def chunk_document(
     )
 
     filename = _document_filename(document)
-    document_id = _document_id(document)
+    # Version the index so hot reloads do not reuse chunks without article metadata.
+    document_id = _document_id(document) + ":articles-v1"
     blocks = _read_attribute(document, "blocks", default=[]) or []
 
     source_units: list[tuple[str, int | None, str | None]] = []
@@ -251,7 +257,14 @@ def chunk_document(
     chunks: list[DocumentChunk] = []
     chunk_index = 0
 
+    current_article = None
+    structured_units = []
     for source_text, page_number, section in source_units:
+        units, current_article = article_units(source_text, current_article)
+        for unit_text, article_number in units:
+            structured_units.append((unit_text, page_number, section, article_number))
+
+    for source_text, page_number, section, article_number in structured_units:
         split_passages = splitter.split_text(source_text)
 
         for passage in split_passages:
@@ -280,6 +293,7 @@ def chunk_document(
                     chunk_index=chunk_index,
                     page_number=page_number,
                     section=section,
+                    article_number=article_number,
                 )
             )
 

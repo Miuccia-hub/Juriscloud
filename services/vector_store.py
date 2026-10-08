@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from typing import Any
 from uuid import uuid4
@@ -8,8 +9,10 @@ from uuid import uuid4
 import chromadb
 from dotenv import load_dotenv
 from openai import OpenAI
+from rank_bm25 import BM25Okapi
 
 from services.text_chunker import DocumentChunk
+from services.legal_sections import requested_articles
 
 
 load_dotenv()
@@ -26,6 +29,7 @@ class SearchResult:
     distance: float | None
     page_number: int | None = None
     section: str | None = None
+    article_number: str | None = None
 
     @property
     def citation_label(self) -> str:
@@ -165,13 +169,30 @@ class JurisourceVectorStore:
         if self.collection.count() == 0:
             return []
 
+        document_filter = None
+        if document_ids is not None:
+            if not document_ids:
+                return []
+            document_filter = {"document_id": {"$in": document_ids}}
+
+        articles = requested_articles(cleaned_question)
+        if articles:
+            article_filter = {"article_number": {"$in": list(articles)}}
+            where = {"$and": [document_filter, article_filter]} if document_filter else article_filter
+            exact = self.collection.get(where=where, include=["documents", "metadatas"])
+            results = self._records_to_results(exact)
+            # Do not answer a provision question from unrelated semantic matches.
+            if not set(articles).issubset({r.article_number for r in results}):
+                return []
+            return sorted(results, key=lambda r: (r.document_id, r.chunk_index))
+
         query_embedding = self._create_embeddings(
             [cleaned_question]
         )[0]
 
         query_arguments: dict[str, Any] = {
             "query_embeddings": [query_embedding],
-            "n_results": top_k,
+            "n_results": min(max(top_k * 3, 1), self.collection.count()),
             "include": [
                 "documents",
                 "metadatas",
@@ -255,6 +276,7 @@ class JurisourceVectorStore:
                     chunk_index=chunk_index,
                     page_number=page_number,
                     section=metadata.get("section"),
+                    article_number=metadata.get("article_number"),
                     distance=(
                         float(distance)
                         if distance is not None
@@ -263,7 +285,44 @@ class JurisourceVectorStore:
                 )
             )
 
-        return search_results
+        # Fuse keyword and semantic ranks for general questions.
+        arguments = {"include": ["documents", "metadatas"]}
+        if document_filter:
+            arguments["where"] = document_filter
+        records = self.collection.get(**arguments)
+        lexical_results = self._records_to_results(records)
+        tokens = lambda value: re.findall(r"\w+", value.lower())
+        corpus = [tokens(r.text) for r in lexical_results]
+        if not corpus or not any(corpus):
+            return search_results[:top_k]
+        scores = BM25Okapi(corpus).get_scores(tokens(cleaned_question))
+        ranked_lexical = sorted(
+            [(r, score) for r, score in zip(lexical_results, scores) if score > 0],
+            key=lambda pair: pair[1], reverse=True,
+        )[:top_k * 3]
+        fused = {}
+        result_map = {}
+        for ranking in (search_results, [r for r, _ in ranked_lexical]):
+            for rank, result in enumerate(ranking, start=1):
+                key = (result.document_id, result.chunk_index)
+                fused[key] = fused.get(key, 0) + 1 / (60 + rank)
+                result_map[key] = result
+        return [result_map[key] for key in sorted(fused, key=fused.get, reverse=True)[:top_k]]
+
+    @staticmethod
+    def _records_to_results(records: dict[str, Any]) -> list[SearchResult]:
+        return [SearchResult(
+            text=text,
+            document_id=str(metadata.get("document_id", "")),
+            filename=str(metadata.get("filename", "Untitled document")),
+            chunk_index=int(metadata.get("chunk_index", 0)),
+            distance=None,
+            page_number=metadata.get("page_number"),
+            section=metadata.get("section"),
+            article_number=metadata.get("article_number"),
+        ) for text, metadata in zip(
+            records.get("documents") or [], records.get("metadatas") or []
+        )]
 
     def has_document(
         self,
